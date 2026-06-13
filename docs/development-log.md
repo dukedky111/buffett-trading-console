@@ -332,6 +332,52 @@ Every day at 06:00
 
 Member-only content note: the system assumes the user has membership, but if the transcript source cannot access a member-only video, it records the access failure instead of fabricating content.
 
+### 12. Firecrawl Real-Time Web Ingestion
+
+Installed Firecrawl skills from:
+
+```text
+firecrawl/cli
+```
+
+Added project entrypoint:
+
+```text
+src/bt_lab/firecrawl_collector.py
+```
+
+Firecrawl is now the preferred real-time ingestion layer for:
+
+- Recent seven-day market news.
+- Company-specific news for user holdings.
+- Fed news and speeches.
+- Treasury yield pages.
+- BEA inflation/PCE pages.
+- SEC/EDGAR reference pages.
+- Company investor relations pages.
+- Research/news source pages used as citations.
+
+Run manually:
+
+```bash
+export FIRECRAWL_API_KEY="fc_your_key_here"
+
+python3 -m src.bt_lab.firecrawl_collector \
+  --ticker MSFT \
+  --ticker NVDA \
+  --output-dir data/raw/firecrawl
+```
+
+Output:
+
+```text
+data/raw/firecrawl/search-*.json
+data/raw/firecrawl/scrape-*.md
+data/raw/firecrawl/latest_summary.json
+```
+
+Daily automation now asks Firecrawl to run before generating market update, news, research, and trading rationale. If Firecrawl is unavailable, the automation must report the setup failure and avoid fabricating live data.
+
 ## Automation
 
 Created automation:
@@ -364,7 +410,7 @@ Automation responsibilities:
 - Read the saved user profile and customize outputs by held companies and asset types.
 - Refresh market OHLCV data.
 - Refresh rates and macro inputs.
-- Refresh recent seven-day news.
+- Refresh recent seven-day news using Firecrawl when available.
 - Refresh equity research summaries.
 - Refresh company-specific news, citations, and full research notes for the user's holdings.
 - Refresh YouTube transcript events if transcript files are present.

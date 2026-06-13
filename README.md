@@ -58,6 +58,20 @@ data/raw/youtube/la_banker/latest_signals.csv
 data/raw/youtube/la_banker/latest_summary.json
 ```
 
+使用 Firecrawl 抓取近一周市场新闻、Fed/Treasury/BEA/SEC 等网页内容：
+
+```bash
+export FIRECRAWL_API_KEY="fc_your_key_here"
+
+python3 -m src.bt_lab.firecrawl_collector \
+  --ticker MSFT \
+  --ticker NVDA \
+  --ticker SGOV \
+  --output-dir data/raw/firecrawl
+```
+
+Firecrawl 负责实时新闻、官方页面、公司 IR/SEC 页面和网页内容抓取；OHLCV 行情仍由金融数据源负责。
+
 生成 Buffett assessment 模板：
 
 ```bash
@@ -92,7 +106,7 @@ python3 -m http.server 8080 --directory web
 http://127.0.0.1:8080
 ```
 
-当前网站包含资产配置饼图、持仓下钻、交易逻辑选择、每日宏观 market update、新闻/研报 feed、Buffett 默认交易建议和个人账户连接入口。
+当前网站包含资产配置饼图、持仓下钻、交易逻辑选择、每日宏观 market update、Firecrawl 新闻/网页抓取入口、研报 feed、Buffett 默认交易建议和个人账户连接入口。
 
 ## 交易哲学
 

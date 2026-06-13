@@ -10,6 +10,8 @@
 - 视频描述。
 - 视频 transcript。
 - 股票行情。
+- Firecrawl 实时新闻搜索结果。
+- Firecrawl 官方网站 / 公司 IR / SEC / Fed / Treasury 页面抓取结果。
 - 财报数据。
 - 公司基本面数据。
 
@@ -72,6 +74,9 @@
 ```text
 data/raw/videos.jsonl
 data/raw/transcripts.jsonl
+data/raw/firecrawl/search-*.json
+data/raw/firecrawl/scrape-*.md
+data/raw/firecrawl/latest_summary.json
 data/processed/events.jsonl
 data/processed/signals.jsonl
 ```
@@ -89,9 +94,49 @@ trade_signals
 backtest_trades
 ```
 
-## 6. 合规原则
+## 6. Firecrawl 新闻 / 网页抓取流程
+
+Firecrawl 用于实时新闻和网站内容抓取，不直接替代价格行情接口。
+
+```text
+用户持仓 / watchlist
+-> 生成 ticker-specific 新闻 query
+-> firecrawl search --sources news --tbs qdr:w --scrape
+-> 保存搜索结果和网页正文
+-> 抽取新闻事实、来源 URL、发布时间、ticker、主题、风险
+-> Buffett 逻辑解释：是否影响 owner earnings / moat / margin of safety
+-> 写入 market update、新闻详情、研报摘要和交易建议
+```
+
+已知官方来源会直接 scrape：
+
+```text
+Federal Reserve news
+U.S. Treasury rates
+BEA PCE
+SEC EDGAR
+Company investor relations pages
+```
+
+运行入口：
+
+```bash
+python3 -m src.bt_lab.firecrawl_collector \
+  --ticker MSFT \
+  --ticker NVDA \
+  --output-dir data/raw/firecrawl
+```
+
+需要：
+
+```bash
+export FIRECRAWL_API_KEY="fc_your_key_here"
+```
+
+## 7. 合规原则
 
 - 优先使用官方 API 或符合平台规则的方式获取数据。
 - 保存视频链接和 transcript 时间戳，便于审计。
 - 不把视频观点当作投资建议。
 - 不绕过平台访问限制。
+- Firecrawl 抓取结果必须保留来源 URL 和抓取摘要，不能把网页内容伪装成模型原创结论。

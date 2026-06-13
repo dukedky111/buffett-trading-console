@@ -1182,7 +1182,7 @@ function getPortfolioMarketSection() {
 
 const connections = [
   { title: "Broker / Portfolio", text: "连接 Interactive Brokers、Robinhood 或券商 CSV，同步真实持仓和成本价。", status: "Mock connector" },
-  { title: "Research Sources", text: "接入研报、RSS、Google Drive 文档和本地 PDF，统一进入 research feed。", status: "Ready for API" },
+  { title: "Research Sources", text: "Firecrawl 负责实时新闻、Fed/Treasury/SEC/IR 页面抓取；研报、RSS、Google Drive 和本地 PDF 可继续接入 research feed。", status: "Firecrawl-ready" },
   { title: "YouTube Transcript", text: "已安装 youtube-full；每天 06:00 检查 @la_banker，新 transcript 转成事件信号，再走 Buffett 过滤器。", status: "Skill installed" },
 ];
 
