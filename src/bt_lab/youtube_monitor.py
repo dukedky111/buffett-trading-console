@@ -23,7 +23,20 @@ DEFAULT_CHANNEL = "@la_banker"
 USER_AGENT = "BuffettMarketConsole/0.1"
 
 
+def load_local_env() -> None:
+    env_path = Path(".env")
+    if not env_path.exists():
+        return
+    for line in env_path.read_text().splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#") or "=" not in stripped:
+            continue
+        key, value = stripped.split("=", 1)
+        os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+
+
 def api_key() -> str:
+    load_local_env()
     key = os.environ.get("TRANSCRIPT_API_KEY", "").strip()
     if not key:
         raise RuntimeError("TRANSCRIPT_API_KEY is required for youtube-full / TranscriptAPI requests.")
