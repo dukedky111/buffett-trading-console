@@ -15,6 +15,85 @@
 5. 输出观察、等待、买入、加仓、减仓、卖出或放弃信号。
 6. 保留每条信号的原文证据，方便复盘和回测。
 
+## 第一版可运行流程
+
+安装依赖：
+
+```bash
+python3 -m pip install -r requirements.txt
+```
+
+抓取五年行情：
+
+```bash
+python3 -m src.bt_lab.dataset_builder \
+  --tickers AAPL MSFT NVDA SPY QQQ \
+  --years 5 \
+  --fetch-yahoo
+```
+
+解析 transcript：
+
+```bash
+python3 -m src.bt_lab.transcript_parser \
+  --input data/raw/transcripts/transcripts.csv \
+  --output data/processed/events.csv
+```
+
+检查 `@la_banker` 最新视频并提炼 Buffett 过滤后的交易信号：
+
+```bash
+export TRANSCRIPT_API_KEY="sk_your_key_here"
+
+python3 -m src.bt_lab.youtube_monitor \
+  --channel @la_banker \
+  --output-dir data/raw/youtube/la_banker
+```
+
+输出会写入：
+
+```text
+data/raw/youtube/la_banker/transcripts_YYYY-MM-DD.jsonl
+data/raw/youtube/la_banker/latest_signals.csv
+data/raw/youtube/la_banker/latest_summary.json
+```
+
+生成 Buffett assessment 模板：
+
+```bash
+python3 -m src.bt_lab.assessment_template \
+  --events data/processed/events.csv \
+  --output data/processed/assessments.csv
+```
+
+运行 Buffett + transcript 回测：
+
+```bash
+python3 -m src.bt_lab.backtester \
+  --prices-dir data/raw/ohlcv \
+  --events data/processed/events.csv \
+  --assessments data/processed/assessments.csv \
+  --strategy buffett_transcript \
+  --initial-cash 100000 \
+  --output-dir data/reports
+```
+
+更多说明见 [docs/implementation.md](docs/implementation.md) 和 [docs/youtube-monitor.md](docs/youtube-monitor.md)。
+
+## 打开网站原型
+
+```bash
+python3 -m http.server 8080 --directory web
+```
+
+然后访问：
+
+```text
+http://127.0.0.1:8080
+```
+
+当前网站包含资产配置饼图、持仓下钻、交易逻辑选择、每日宏观 market update、新闻/研报 feed、Buffett 默认交易建议和个人账户连接入口。
+
 ## 交易哲学
 
 - 不根据市场预测交易。

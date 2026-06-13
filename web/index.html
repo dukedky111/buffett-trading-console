@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Buffett Market Console</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Buffett Transcript Trading</p>
+        <h1>Market Console</h1>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-button" type="button" title="Refresh market data" aria-label="Refresh market data">
+          <span aria-hidden="true">↻</span>
+        </button>
+        <button class="primary-button" type="button" id="connectButton">连接个人账户</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="workspace-grid">
+        <aside class="allocation-panel" aria-label="Portfolio allocation">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Portfolio</p>
+              <h2>资产配置</h2>
+            </div>
+            <p class="muted">$248,320</p>
+          </div>
+
+          <button class="pie-wrap" type="button" id="pieChart" aria-label="Open holding details">
+            <svg class="allocation-pie" id="allocationPieSvg" viewBox="0 0 420 360" aria-hidden="true"></svg>
+            <span class="pie-center">
+              <strong id="selectedSliceLabel">US Equity</strong>
+              <small id="selectedSliceValue">52%</small>
+            </span>
+            <span class="pie-tooltip" id="pieTooltip" role="tooltip"></span>
+          </button>
+
+          <div class="legend" id="allocationLegend"></div>
+
+          <div class="holdings-detail">
+            <div class="section-heading compact">
+              <h3 id="holdingTitle">US Equity 持仓</h3>
+              <button class="text-button" type="button" id="showAllHoldings">全部</button>
+            </div>
+            <div class="holding-list" id="holdingList"></div>
+          </div>
+        </aside>
+
+        <section class="main-panel">
+          <div class="portfolio-advice" id="portfolioAdvice"></div>
+
+          <div class="control-strip">
+            <label class="field">
+              <span>交易逻辑</span>
+              <select id="strategySelect">
+                <option value="overall">Overall Combined Advice</option>
+                <option value="buffett" selected>Buffett Value Default</option>
+                <option value="transcript">Transcript Signal</option>
+                <option value="momentum">Momentum Trend</option>
+                <option value="meanReversion">Mean Reversion</option>
+                <option value="rotation">ETF Rotation</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>风险档位</span>
+              <select id="riskSelect">
+                <option>Conservative</option>
+                <option selected>Balanced</option>
+                <option>Opportunistic</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>数据范围</span>
+              <select id="rangeSelect">
+                <option>1Y</option>
+                <option>3Y</option>
+                <option selected>5Y</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="strategy-summary" id="strategySummary"></div>
+
+          <div class="section-heading compact">
+            <div>
+              <p class="eyebrow">Direct Action Plan</p>
+              <h2>今日交易指令</h2>
+            </div>
+            <button class="text-button" type="button" id="editProfileButton">更新持仓/哲学</button>
+          </div>
+          <div class="recommendation-grid" id="recommendationGrid"></div>
+        </section>
+      </section>
+
+      <section class="market-update">
+        <div class="report-heading">
+          <div>
+            <p class="eyebrow">Daily Macro Market Update</p>
+            <h2 id="marketDate">US</h2>
+          </div>
+          <nav class="report-tabs" aria-label="Market update regions">
+            <button type="button" class="tab active" data-region="us">US</button>
+            <button type="button" class="tab" data-region="europe">Europe & UK</button>
+            <button type="button" class="tab" data-region="china">China (HK)</button>
+            <button type="button" class="tab" data-region="rates">Rates</button>
+          </nav>
+          <label class="field date-field">
+            <span>Market Date</span>
+            <input id="marketDatePicker" type="date" value="2026-06-13" />
+          </label>
+        </div>
+
+        <div class="market-tables" id="marketTables"></div>
+
+        <article class="macro-report" id="macroReport"></article>
+      </section>
+
+      <section class="research-grid">
+        <div class="research-column">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">News Monitor</p>
+              <h2>相关资产新闻</h2>
+            </div>
+            <button class="icon-button" type="button" title="Filter news" aria-label="Filter news">≡</button>
+          </div>
+          <div class="feed" id="newsFeed"></div>
+        </div>
+
+        <div class="research-column">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Equity Research</p>
+              <h2>研报摘要</h2>
+            </div>
+            <button class="icon-button" type="button" title="Add research source" aria-label="Add research source">+</button>
+          </div>
+          <div class="feed" id="researchFeed"></div>
+        </div>
+
+        <div class="research-column">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Personal</p>
+              <h2>连接个人</h2>
+            </div>
+          </div>
+          <div class="connection-list" id="connectionList"></div>
+        </div>
+      </section>
+    </main>
+
+    <dialog id="holdingDialog">
+      <div class="dialog-head">
+        <h2>具体持股</h2>
+        <button class="icon-button" type="button" id="closeDialog" aria-label="Close">×</button>
+      </div>
+      <div class="dialog-body">
+        <table>
+          <thead>
+            <tr>
+              <th>Ticker</th>
+              <th>Name</th>
+              <th>Weight</th>
+              <th>Buffett Score</th>
+              <th>Advice</th>
+            </tr>
+          </thead>
+          <tbody id="dialogHoldings"></tbody>
+        </table>
+      </div>
+    </dialog>
+
+    <dialog id="researchDialog">
+      <div class="dialog-head">
+        <div>
+          <p class="eyebrow">Equity Research</p>
+          <h2 id="researchDialogTitle">Full Report</h2>
+        </div>
+        <button class="icon-button" type="button" id="closeResearchDialog" aria-label="Close">×</button>
+      </div>
+      <div class="dialog-body research-report-body" id="researchDialogBody"></div>
+    </dialog>
+
+    <dialog id="tradeDialog">
+      <div class="dialog-head">
+        <div>
+          <p class="eyebrow">Trade Instruction Detail</p>
+          <h2 id="tradeDialogTitle">交易理由与风险</h2>
+        </div>
+        <button class="icon-button" type="button" id="closeTradeDialog" aria-label="Close">×</button>
+      </div>
+      <div class="dialog-body research-report-body" id="tradeDialogBody"></div>
+    </dialog>
+
+    <dialog id="onboardingDialog">
+      <form method="dialog" id="onboardingForm">
+        <div class="dialog-head">
+          <div>
+            <p class="eyebrow">First Setup</p>
+            <h2>先告诉我你的持仓和交易哲学</h2>
+          </div>
+        </div>
+        <div class="dialog-body onboarding-body">
+          <label class="form-field">
+            <span>账户总金额</span>
+            <input id="profileTotalAmount" type="text" inputmode="decimal" placeholder="例：248320 或 $248,320" />
+          </label>
+          <div class="form-field">
+            <div class="asset-entry-head">
+              <span>逐行输入资产</span>
+              <button class="icon-button" type="button" id="addAssetRow" aria-label="Add asset row">+</button>
+            </div>
+            <div class="asset-entry-list" id="assetEntryList"></div>
+            <p class="source-note">每一行只写一个股票、ETF、bond 或现金项目。右侧可以写数量、金额或比例，例如：10 shares、$5000、15%。</p>
+          </div>
+          <label class="form-field">
+            <span>交易哲学</span>
+            <select id="profilePhilosophy">
+              <option value="buffett" selected>Buffett 价值投资：好公司 + 好价格 + 安全边际</option>
+              <option value="balanced">均衡：价值为主，趋势辅助</option>
+              <option value="active">主动交易：视频/新闻/技术信号也参与</option>
+            </select>
+          </label>
+          <label class="form-field">
+            <span>风险承受能力</span>
+            <select id="profileRisk">
+              <option value="conservative">保守：少交易，现金多一点</option>
+              <option value="balanced" selected>均衡：核心仓 + 少量机会仓</option>
+              <option value="opportunistic">进取：愿意小仓位尝试机会</option>
+            </select>
+          </label>
+          <label class="form-field">
+            <span>投资周期</span>
+            <select id="profileHorizon">
+              <option value="long" selected>长期：3-5 年以上</option>
+              <option value="medium">中期：6-24 个月</option>
+              <option value="short">短期：1-12 周</option>
+            </select>
+          </label>
+          <p class="source-note">保存后，首页会按你的持仓和交易哲学生成更直接的交易指令。这里是研究辅助工具，不是保证收益的投资承诺。</p>
+        </div>
+        <div class="dialog-actions">
+          <button class="text-button" type="button" id="skipOnboarding">先用默认配置</button>
+          <button class="primary-button" type="submit">保存并生成建议</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

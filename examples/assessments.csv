@@ -1,0 +1,2 @@
+date,ticker,quality_score,intrinsic_value,required_margin_of_safety,management_integrity_problem,major_financial_red_flags,price_level_score
+2024-01-02,NVDA,82,150,0.30,false,false,70
