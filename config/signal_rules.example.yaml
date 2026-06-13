@@ -1,0 +1,53 @@
+strategy:
+  name: Buffett Transcript Value Signal
+  version: 0.1.0
+
+transcript_signal:
+  minimum_watch_score: 40
+  minimum_trade_score: 60
+  weights:
+    explicit_stock: 20
+    explicit_price_level: 20
+    clear_reasoning: 20
+    risk_disclosure: 10
+    fundamental_alignment: 20
+    repeated_mentions: 10
+
+buffett_filter:
+  minimum_quality_score: 75
+  reject_below_quality_score: 65
+  management_integrity_one_strike: true
+  max_no_answers_for_trade: 2
+
+valuation:
+  default_required_margin_of_safety: 0.30
+  excellent_business_margin_of_safety: 0.20
+  uncertain_business_margin_of_safety: 0.50
+  default_buy_threshold: 0.70
+  excellent_business_buy_threshold: 0.80
+
+position_sizing:
+  max_single_position: 0.12
+  normal_position: [0.02, 0.04]
+  high_conviction_position: [0.05, 0.08]
+  uncertain_position_max: 0.02
+  cash_reserve: [0.10, 0.20]
+
+risk_limits:
+  max_single_industry_exposure: 0.30
+  max_correlated_tech_growth_exposure: 0.35
+  max_cyclical_exposure: 0.20
+  max_high_leverage_exposure: 0.10
+  portfolio_review_drawdown: 0.15
+  portfolio_defensive_drawdown: 0.20
+
+sell_rules:
+  trim_at_intrinsic_value_multiple: 1.10
+  reduce_at_intrinsic_value_multiple: 1.30
+  sell_at_intrinsic_value_multiple: 1.50
+  immediate_sell_triggers:
+    - accounting_fraud
+    - management_deception
+    - moat_destroyed
+    - cash_flow_collapse
+    - debt_crisis_dilution_risk
